@@ -17,24 +17,15 @@ public class LuaMC
 {
     public static final String MODID = "mclua";
     public static final String NAME = "Minecraft Lua Mod";
-    public static final String VERSION = "0.01";
+    public static final String VERSION = "0.010000000000000000000000000000000000000000000000000002";
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-
+        
         // some example code
         System.out.println("WE HAVE LIFTOFF");
 
-        // TODO: Player object cannot be obtained, since they are not in a world yet.
-        // EntityPlayerSP player = Minecraft.getMinecraft().player;
-
-        if (Minecraft.IS_RUNNING_ON_MAC) {
-            for (int i = 0; i < 100; i++) {
-                System.out.println("Linux masterrace <o/");
-            }
-            System.exit(1);
-        }
     }
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
