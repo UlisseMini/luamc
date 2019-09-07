@@ -1,0 +1,16 @@
+[
+{
+  "modid": "luamc",
+  "name": "Minecraft Lua Mod",
+  "description": "fffffffffffffffffffuck",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://uli.rocks/",
+  "updateUrl": "http://example.com/",
+  "authorList": ["UlisseMini", "Goopsii"],
+  "credits": "see authorlist you moron",
+  "logoFile": "assets/examplemod/textures/logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
