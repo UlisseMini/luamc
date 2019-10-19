@@ -20,10 +20,5 @@ public class TestCommand extends CommandBase {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        EntityPlayer player = (EntityPlayer)sender;
-        EntityLivingBase.moveForward();
-        if (player instanceof EntityPlayer)
-            System.out.println(player.move());
-            
     }
 }
