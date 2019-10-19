@@ -1,8 +1,5 @@
 package com.luamc.luamc;
 
-// import net.minecraft.client.Minecraft;
-// import net.minecraftforge.common.MinecraftForge;
-// import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -17,18 +14,22 @@ public class LuaMC
 {
     public static final String MODID = "mclua";
     public static final String NAME = "Minecraft Lua Mod";
-    public static final String VERSION = "0.069";
+    public static final String VERSION = "0.078";
+
+    LuaThread thread;
 
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        
+        thread = new LuaThread();
+        thread.start();
+
         // some example code
         System.out.println("WE HAVE LIFTOFF");
     }
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
-        event.registerServerCommand(new LuaCommand());
-        event.registerServerCommand(new TestCommand());
+        event.registerServerCommand(new LuaCommand(thread));
+        event.registerServerCommand(new AbortCommand(thread));
     }
 }

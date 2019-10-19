@@ -19,6 +19,13 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 public class LuaCommand extends CommandBase {
+    // Lua is ran on a seaperate thread.
+    LuaThread thread;
+
+    LuaCommand(LuaThread thread) {
+        super();
+        this.thread = thread;
+    }
 
     @Override
     public String getName() {
@@ -51,19 +58,6 @@ public class LuaCommand extends CommandBase {
         }
     }
 
-    // TODO: Doesn't freeze anymore, working on how to terminate thread
-    private LuaValue loadFile(String path) {
-        Globals globals = JsePlatform.standardGlobals();
-        globals.set("print", new print(path));
-        globals.set("player", player.table());
-
-        // Use the convenience function on Globals to load a chunk.
-        LuaValue chunk = globals.loadfile(path);
-
-        // Use any of the "call()" or "invoke()" functions directly on the chunk.
-        return chunk.call(LuaValue.valueOf(path));
-    }
-
     @Override
     public int getRequiredPermissionLevel() {
         return 0;
@@ -83,10 +77,9 @@ public class LuaCommand extends CommandBase {
         } else {
             String path = "lua/" + args[0];
             try {
-                // new Thread(() -> doWork(someParam)).start();
-                Thread LuaThread = new Thread(() -> loadFile(path));
-                LuaThread.start();
-            } catch (LuaError e) { // TODO: Only catch lua exceptions
+                // Send a boi to the lua thread for running
+                this.thread.spawn_run(path);
+            } catch (InterruptedException e) {
                 gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + e.getMessage()));
             }
         }
