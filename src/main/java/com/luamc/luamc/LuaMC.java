@@ -21,11 +21,9 @@ public class LuaMC
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+        // Start up the Lua Thread.
         thread = new LuaThread();
         thread.start();
-
-        // some example code
-        System.out.println("WE HAVE LIFTOFF");
     }
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {

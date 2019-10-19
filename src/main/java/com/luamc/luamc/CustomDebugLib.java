@@ -1,5 +1,6 @@
 package com.luamc.luamc;
 
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.DebugLib;
 
@@ -10,10 +11,8 @@ public class CustomDebugLib extends DebugLib {
     @Override
     public void onInstruction(int pc, Varargs v, int top) {
         if (interrupted) {
-            throw new ScriptInterruptException();
+            throw new LuaError("interrupted!");
         }
         super.onInstruction(pc, v, top);
     }
-
-    public static class ScriptInterruptException extends RuntimeException {}
 }

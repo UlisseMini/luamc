@@ -2,11 +2,10 @@ package com.luamc.luamc;
 
 import java.nio.file.Paths;
 
-import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.VarArgFunction;
-import org.luaj.vm2.lib.jse.JsePlatform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
@@ -57,6 +56,19 @@ public class LuaCommand extends CommandBase {
             return null;
         }
     }
+
+    static class sleep extends OneArgFunction {
+		public LuaValue call(LuaValue seconds) {
+			try {
+				Thread.sleep(seconds.tolong());
+			} catch (InterruptedException e) {
+				throw new LuaError("Thread Interrupted");
+			}
+			return null;
+		}
+
+	}
+
 
     @Override
     public int getRequiredPermissionLevel() {

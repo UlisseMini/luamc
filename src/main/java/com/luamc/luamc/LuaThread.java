@@ -4,6 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.luamc.luamc.LuaCommand.print;
+import com.luamc.luamc.LuaCommand.sleep;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
@@ -32,10 +33,10 @@ public class LuaThread extends Thread {
     }
 
 
-    // TODO: Doesn't freeze anymore, working on how to terminate thread
     private LuaValue loadFile(String path) {
         Globals globals = JsePlatform.standardGlobals();
         globals.set("print", new print(path));
+        globals.set("sleep", new sleep());
         globals.set("player", player.table());
         globals.load(debugLib);
 
@@ -46,6 +47,7 @@ public class LuaThread extends Thread {
         return chunk.call(LuaValue.valueOf(path));
     }
 
+    
     public void run() {
         System.out.println("thread started");
 
