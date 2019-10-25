@@ -1,4 +1,4 @@
-#java luamc
+# UNDER DEVELOPMENT, NOT DONE, DON'T EVEN TRY USING THIS YET
 
 Control minecraft from lua!
 
