@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.luamc.luamc.LuaCommand.print;
 import com.luamc.luamc.LuaCommand.sleep;
+import com.luamc.luamc.player;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
@@ -47,7 +48,7 @@ public class LuaThread extends Thread {
         return chunk.call(LuaValue.valueOf(path));
     }
 
-    
+
     public void run() {
         System.out.println("thread started");
 
@@ -75,6 +76,9 @@ public class LuaThread extends Thread {
             } catch (LuaError e) {
                 GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
                 gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + e.getMessage()));
+            } catch (java.lang.StackOverflowError a) { // HI WHY CAN IT BREAK HERE? PLEASE HELP ALSDLKASJDLAKSD
+                GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
+                gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + a.getMessage()));
             }
             debugLib.interrupted = false;
         }

@@ -26,6 +26,7 @@ public class LuaMC
         // Start up the Lua Thread.
         thread = new LuaThread();
         thread.start();
+        thread.setName("LuaThread");
         // Create the lua folder if it doesn't already exist
         try {
             new File("lua").mkdir();
@@ -34,7 +35,7 @@ public class LuaMC
         catch(NullPointerException e) {
             // do nothing cause we don't care, screw you
         }
-        
+
     }
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
