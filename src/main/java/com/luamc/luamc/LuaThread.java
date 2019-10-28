@@ -28,8 +28,7 @@ public class LuaThread extends Thread {
 
     // Run a lua file on the LuaThread.
     public void spawn_run(String path) throws InterruptedException {
-        tasks.put(path);
-        
+        tasks.put(path);   
     }
 
 
@@ -37,7 +36,7 @@ public class LuaThread extends Thread {
         Globals globals = JsePlatform.standardGlobals();
         globals.set("print", new print(path));
         globals.set("sleep", new sleep());
-        globals.set("player", player.table());
+        globals.load(new Player());
         globals.load(debugLib);
 
         // Use the convenience function on Globals to load a chunk.
