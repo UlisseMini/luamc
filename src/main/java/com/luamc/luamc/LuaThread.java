@@ -5,8 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.luamc.luamc.LuaCommand.print;
 import com.luamc.luamc.LuaCommand.sleep;
-import com.luamc.luamc.player;
-
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
