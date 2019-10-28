@@ -1,5 +1,7 @@
 package com.luamc.luamc;
 
+import java.io.File;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -24,6 +26,16 @@ public class LuaMC
         // Start up the Lua Thread.
         thread = new LuaThread();
         thread.start();
+        thread.setName("LuaThread");
+        // Create the lua folder if it doesn't already exist
+        try {
+            new File("lua").mkdir();
+        }
+
+        catch(NullPointerException e) {
+            // do nothing cause we don't care, screw you
+        }
+
     }
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
