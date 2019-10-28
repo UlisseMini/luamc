@@ -10,13 +10,10 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-// import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-// import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-// import org.apache.logging.log4j.Logger;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
-
+import net.minecraftforge.client.ClientCommandHandler;
 
 @Mod(modid = LuaMC.MODID, name = LuaMC.NAME, version = LuaMC.VERSION)
 public class LuaMC
@@ -31,6 +28,7 @@ public class LuaMC
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
+
         cancel = new KeyBinding("Cancel", Keyboard.KEY_X, "LuaMC");
         ClientRegistry.registerKeyBinding(cancel);
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
@@ -39,6 +37,8 @@ public class LuaMC
         thread = new LuaThread();
         thread.start();
         thread.setName("LuaThread");
+
+        ClientCommandHandler.instance.registerCommand(new LuaCommand(thread));
 
         // Create the lua folder if it doesn't already exist
         try {
@@ -61,11 +61,5 @@ public class LuaMC
                 thread.poopsie();
             }
         }
-    }
- 
-    @EventHandler
-    public void serverLoad(FMLServerStartingEvent event) {
-        event.registerServerCommand(new LuaCommand(thread));
-        event.registerServerCommand(new AbortCommand(thread));
     }
 }
