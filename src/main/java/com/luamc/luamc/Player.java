@@ -1,5 +1,8 @@
 package com.luamc.luamc;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -7,8 +10,10 @@ import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import org.lwjgl.input.Mouse;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
 
 import net.minecraft.client.settings.KeyBinding;
@@ -23,8 +28,11 @@ public class Player extends TwoArgFunction {
 		player.set("turnPitch", new turnPitch());
 		player.set("getFood", new getFood());
 		player.set("getHealth", new getHealth());
-		player.set("slot", new slot());
+		player.set("moveSlot", new slot());
 		player.set("getPos", new getPos());
+		player.set("rclick", new rclick());
+		player.set("lclick", new lclick());
+		player.set("getMouseEvent", new getMouseEvent());
 		env.set("player", player);
 		env.set("settings", CoerceJavaToLua.coerce(Minecraft.getMinecraft().gameSettings));
 
@@ -42,16 +50,25 @@ public class Player extends TwoArgFunction {
 	final class press extends ZeroArgFunction {
 		int code;
 		boolean bool;
+
 		press(int code, boolean bool) {
 			this.code = code;
 			this.bool = bool;
 		}
+
 		public LuaValue call() {
 			KeyBinding.setKeyBindState(code, bool);
 			return LuaValue.NIL;
 		}
 	}
 
+	final class getMouseEvent extends ZeroArgFunction {
+		public LuaValue call() {
+			return LuaValue.valueOf(Mouse.getEventButton());
+		}
+	}
+
+	// screw you java
 	final class key extends OneArgFunction {
 		public LuaValue call(LuaValue key) {
 			int keycode = -1337;
@@ -64,20 +81,18 @@ public class Player extends TwoArgFunction {
 				for (KeyBinding kb : settings.keyBindings) {
 					String name = kb.getKeyDescription();
 					int idx = name.lastIndexOf('.');
-					name = name.substring(idx+1, name.length());
-					
+					name = name.substring(idx + 1, name.length());
+
 					if (keyname.equals(name)) {
 						keycode = kb.getKeyCode();
 					}
 
-				} 
+				}
 				if (keycode == -1337) {
-					throw new LuaError(
-						"Could not find key '" + keyname + "'");
+					throw new LuaError("Could not find key '" + keyname + "'");
 				}
 			} else {
-				throw new LuaError(
-					"Invalid argument #1 to 'key' (expected string or int got " + key.typename() + ")");
+				throw new LuaError("Invalid argument #1 to 'key' (expected string or int got " + key.typename() + ")");
 			}
 
 			return make_keyobj(keycode);
@@ -119,7 +134,6 @@ public class Player extends TwoArgFunction {
 		}
 	}
 
-
 	final class startWalking extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
@@ -159,14 +173,59 @@ public class Player extends TwoArgFunction {
 	}
 
 	final class getPos extends ZeroArgFunction {
-		public LuaValue call() { //, MC.player.posY, MC.player.posZ
+		public LuaValue call() { // , MC.player.posY, MC.player.posZ
 			LuaValue pos = new LuaTable();
 			Minecraft MC = Minecraft.getMinecraft();
 			pos.set("X", MC.player.posX);
 			pos.set("Y", MC.player.posY);
 			pos.set("Z", MC.player.posZ);
-			
+
 			return pos;
 		}
+	}
+
+	final class rclick extends ZeroArgFunction {
+		public LuaValue call() {
+			Minecraft MC = Minecraft.getMinecraft();
+			tryRunMethods(MC, new String[] { "rightClickMouse", "func_147121_ag" });
+			return LuaValue.NIL;
+		}
+	}
+	
+	final class lclick extends ZeroArgFunction {
+		public LuaValue call() {
+			Minecraft MC = Minecraft.getMinecraft();
+			tryRunMethods(MC, new String[] { "clickMouse", "func_147116_af" });
+			return LuaValue.NIL;
+		}
+	}
+
+// WHAT DOES THIS DO
+	public static Object tryRunMethods(Object o, String[] methodNames) {
+		Method method = null;
+		for (String name : methodNames) {
+			if ((method = tryGetMethod(o, name)) != null)
+				break;
+		}
+		if (method != null) {
+			try {
+				method.setAccessible(true);
+				return method.invoke(o);
+			} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+// ALSO HERE
+	public static Method tryGetMethod(Object o, String methodName) {
+		try {
+			return o.getClass().getDeclaredMethod(methodName);
+		} catch (NoSuchMethodException e) {
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
