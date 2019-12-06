@@ -7,31 +7,34 @@ import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ThreeArgFunction;
 import org.luaj.vm2.lib.TwoArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.lwjgl.input.Mouse;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
 
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.math.BlockPos;
 
 public class Player extends TwoArgFunction {
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable player = new LuaTable();
 		player.set("key", new key());
-		player.set("startWalking", new startWalking());
-		player.set("stopWalking", new stopWalking());
-		player.set("turnYaw", new turnYaw());
-		player.set("turnPitch", new turnPitch());
+		player.set("setYaw", new setYaw());
+		player.set("setPitch", new setPitch());
+		player.set("getYaw", new getYaw());
+		player.set("getPitch", new getPitch());
 		player.set("getFood", new getFood());
 		player.set("getHealth", new getHealth());
 		player.set("moveSlot", new slot());
 		player.set("getPos", new getPos());
 		player.set("rclick", new rclick());
 		player.set("lclick", new lclick());
+		player.set("inspect", new inspect());
 		player.set("getMouseEvent", new getMouseEvent());
 		env.set("player", player);
 		env.set("settings", CoerceJavaToLua.coerce(Minecraft.getMinecraft().gameSettings));
@@ -99,7 +102,7 @@ public class Player extends TwoArgFunction {
 		}
 	}
 
-	final class turnYaw extends OneArgFunction {
+	final class setYaw extends OneArgFunction {
 		public LuaValue call(LuaValue dir) {
 			Minecraft MC = Minecraft.getMinecraft();
 			if (dir.isnumber()) {
@@ -124,7 +127,7 @@ public class Player extends TwoArgFunction {
 		}
 	}
 
-	final class turnPitch extends OneArgFunction {
+	final class setPitch extends OneArgFunction {
 		public LuaValue call(LuaValue dir) {
 			if (dir.isnumber()) {
 				Minecraft MC = Minecraft.getMinecraft();
@@ -134,21 +137,20 @@ public class Player extends TwoArgFunction {
 		}
 	}
 
-	final class startWalking extends ZeroArgFunction {
+	final class getYaw extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
-			KeyBinding.setKeyBindState(MC.gameSettings.keyBindForward.getKeyCode(), true);
-			return LuaValue.TRUE;
+			return LuaValue.valueOf(MC.player.rotationYaw);
 		}
 	}
 
-	final class stopWalking extends ZeroArgFunction {
+	final class getPitch extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
-			KeyBinding.setKeyBindState(MC.gameSettings.keyBindForward.getKeyCode(), false);
-			return LuaValue.TRUE;
+			return LuaValue.valueOf(MC.player.rotationPitch);
 		}
 	}
+
 
 	final class getFood extends ZeroArgFunction {
 		public LuaValue call() {
@@ -173,7 +175,7 @@ public class Player extends TwoArgFunction {
 	}
 
 	final class getPos extends ZeroArgFunction {
-		public LuaValue call() { // , MC.player.posY, MC.player.posZ
+		public LuaValue call() { 
 			LuaValue pos = new LuaTable();
 			Minecraft MC = Minecraft.getMinecraft();
 			pos.set("X", MC.player.posX);
@@ -187,7 +189,7 @@ public class Player extends TwoArgFunction {
 	final class rclick extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
-			tryRunMethods(MC, new String[] { "rightClickMouse", "func_147121_ag" });
+			tryRunMethods(MC, new String[] { "rightClickMouse", "func_147121_ag" }); //thank fuck for the internet
 			return LuaValue.NIL;
 		}
 	}
@@ -195,12 +197,20 @@ public class Player extends TwoArgFunction {
 	final class lclick extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
-			tryRunMethods(MC, new String[] { "clickMouse", "func_147116_af" });
+			tryRunMethods(MC, new String[] { "clickMouse", "func_147116_af" }); // thank fuck for the internet
 			return LuaValue.NIL;
 		}
 	}
 
-// WHAT DOES THIS DO
+	final class inspect extends ThreeArgFunction {
+		public LuaValue call(LuaValue LuaX, LuaValue LuaY, LuaValue LuaZ) {
+			BlockPos pos = new BlockPos(LuaX.toint(), LuaY.toint(), LuaZ.toint()); // "what happens if you pass it a string" fuck you
+			Block block = Minecraft.getMinecraft().world.getBlockState(pos).getBlock();
+			return LuaValue.valueOf(block.toString());
+		}
+	}
+
+// the wonders of copy/paste
 	public static Object tryRunMethods(Object o, String[] methodNames) {
 		Method method = null;
 		for (String name : methodNames) {
@@ -218,7 +228,7 @@ public class Player extends TwoArgFunction {
 		}
 		return null;
 	}
-// ALSO HERE
+
 	public static Method tryGetMethod(Object o, String methodName) {
 		try {
 			return o.getClass().getDeclaredMethod(methodName);
