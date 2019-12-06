@@ -10,7 +10,6 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -20,7 +19,7 @@ public class LuaMC
 {
     public static final String MODID = "mclua";
     public static final String NAME = "Minecraft Lua Mod";
-    public static final String VERSION = "0.078";
+    public static final String VERSION = "0.25";
 
     LuaThread thread;
     KeyBinding cancel;
@@ -48,7 +47,6 @@ public class LuaMC
         catch(NullPointerException e) {
             // do nothing cause we don't care, screw you
         }
-
     }
 
     final class KeyInputHandler
