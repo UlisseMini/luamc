@@ -1,5 +1,6 @@
 package com.luamc.luamc;
 
+import java.io.File;
 import java.nio.file.Paths;
 
 import org.luaj.vm2.LuaError;
@@ -84,16 +85,23 @@ public class LuaCommand extends CommandBase {
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
 
+
         if (args.length < 1) {
             gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + getUsage(null)));
         } else {
             String path = "lua/" + args[0];
+            File file = new File(path);
+            boolean exists = file.exists();
+            if (!exists) {
+                gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + "File not found"));
+                return;
+            }
             try {
                 // Send a boi to the lua thread for running
                 this.thread.spawn_run(path);
             } catch (InterruptedException e) {
                 gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + e.getMessage()));
-            }
+            } 
         }
     }
 }
