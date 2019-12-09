@@ -36,6 +36,8 @@ public class Player extends TwoArgFunction {
 		player.set("lclick", new lclick());
 		player.set("inspect", new inspect());
 		player.set("getMouseEvent", new getMouseEvent());
+		player.set("getItemName", new inspectItem());
+		player.set("getItemCount", new itemCount());
 		env.set("player", player);
 		env.set("settings", CoerceJavaToLua.coerce(Minecraft.getMinecraft().gameSettings));
 
@@ -206,7 +208,21 @@ public class Player extends TwoArgFunction {
 		public LuaValue call(LuaValue LuaX, LuaValue LuaY, LuaValue LuaZ) {
 			BlockPos pos = new BlockPos(LuaX.toint(), LuaY.toint(), LuaZ.toint()); // "what happens if you pass it a string" fuck you
 			Block block = Minecraft.getMinecraft().world.getBlockState(pos).getBlock();
-			return LuaValue.valueOf(block.toString());
+			return LuaValue.valueOf(block.toString().substring(6, block.toString().length() -1)); // :)
+		}
+	}
+
+	final class inspectItem extends ZeroArgFunction {
+		public LuaValue call () {
+			String id = Minecraft.getMinecraft().player.inventory.getCurrentItem().getItem().getRegistryName().toString();
+			return LuaValue.valueOf(id);
+		}
+	}
+
+	final class itemCount extends ZeroArgFunction {
+		public LuaValue call () {
+			int count = Minecraft.getMinecraft().player.inventory.getCurrentItem().getCount();
+			return LuaValue.valueOf(count);
 		}
 	}
 
