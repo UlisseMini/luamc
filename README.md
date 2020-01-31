@@ -12,3 +12,6 @@ A: luamc lets you control *your player*, no need to craft a robot, also it is co
 Q: Why does the code suck so much
 
 A: This is me & my friends first time writing a minecraft mod, and first time writing java, also fuck you
+
+## PS
+You need the LuaJ jar file in the minecraft mods folder
