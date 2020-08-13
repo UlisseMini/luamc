@@ -14,4 +14,4 @@ Q: Why does the code suck so much
 A: This is me & my friends first time writing a minecraft mod, and first time writing java, also fuck you
 
 ## PS
-You need the LuaJ jar file in the minecraft mods folder
+Make sure to snag the LuaJ jar file from libs/

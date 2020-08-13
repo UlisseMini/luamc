@@ -30,7 +30,6 @@ public class LuaThread extends Thread {
         tasks.put(path);   
     }
 
-
     private LuaValue loadFile(String path) {
         Globals globals = JsePlatform.standardGlobals();
         globals.set("print", new print(path));
@@ -45,14 +44,12 @@ public class LuaThread extends Thread {
         return chunk.call(LuaValue.valueOf(path));
     }
 
-
     public void run() {
         System.out.println("thread started");
 
         String path = null;
         while (run.get()) {
             System.out.println("Waiting for task");
-
 
             // Get a task and execute it
             try {
@@ -73,9 +70,9 @@ public class LuaThread extends Thread {
             } catch (LuaError e) {
                 GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
                 gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + e.getMessage()));
-            } catch (java.lang.StackOverflowError a) { // HI WHY CAN IT BREAK HERE? PLEASE HELP ALSDLKASJDLAKSD
+            } catch (java.lang.StackOverflowError a) { // bro what the fuuuuuuuck past goopsie was right
                 GuiIngame gui = Minecraft.getMinecraft().ingameGUI;
-                gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.RED + a.getMessage()));
+                gui.addChatMessage(ChatType.SYSTEM, new TextComponentString(TextFormatting.DARK_RED + a.getMessage())); // dark red so if something poopsies htey know oopsieee
             }
             debugLib.interrupted = false;
         }

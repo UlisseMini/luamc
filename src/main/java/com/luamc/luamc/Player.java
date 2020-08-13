@@ -19,25 +19,28 @@ import net.minecraft.client.settings.GameSettings;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 
 public class Player extends TwoArgFunction {
 	public LuaValue call(LuaValue modname, LuaValue env) {
 		LuaTable player = new LuaTable();
-		player.set("key", new key());
-		player.set("setYaw", new setYaw());
-		player.set("setPitch", new setPitch());
-		player.set("getYaw", new getYaw());
-		player.set("getPitch", new getPitch());
-		player.set("getFood", new getFood());
-		player.set("getHealth", new getHealth());
-		player.set("moveSlot", new slot());
-		player.set("getPos", new getPos());
-		player.set("rclick", new rclick());
-		player.set("lclick", new lclick());
-		player.set("inspect", new inspect());
-		player.set("getMouseEvent", new getMouseEvent());
-		player.set("getItemName", new inspectItem());
-		player.set("getItemCount", new itemCount());
+		player.set("key",				new key());
+		player.set("setYaw",			new setYaw());
+		player.set("setPitch",			new setPitch());
+		player.set("getYaw",			new getYaw());
+		player.set("getPitch",			new getPitch());
+		player.set("getFood",			new getFood());
+		player.set("getHealth", 		new getHealth());
+		player.set("moveSlot",			new slot());
+		player.set("getPos",			new getPos());
+		player.set("rclick",			new rclick());
+		player.set("lclick",			new lclick());
+		player.set("inspect",			new inspect());
+		player.set("getMouseEvent",		new getMouseEvent());
+		player.set("getItemName",		new inspectItem());
+		player.set("getItemCount",		new itemCount());
+		player.set("getLookedAtBlock",  new lookedatblock());
+		player.set("chat",				new chat());
 		env.set("player", player);
 		env.set("settings", CoerceJavaToLua.coerce(Minecraft.getMinecraft().gameSettings));
 
@@ -199,16 +202,20 @@ public class Player extends TwoArgFunction {
 	final class lclick extends ZeroArgFunction {
 		public LuaValue call() {
 			Minecraft MC = Minecraft.getMinecraft();
-			tryRunMethods(MC, new String[] { "clickMouse", "func_147116_af" }); // thank fuck for the internet
+			tryRunMethods(MC, new String[] { "clickMouse", "func_147116_af" });
 			return LuaValue.NIL;
 		}
 	}
 
 	final class inspect extends ThreeArgFunction {
 		public LuaValue call(LuaValue LuaX, LuaValue LuaY, LuaValue LuaZ) {
-			BlockPos pos = new BlockPos(LuaX.toint(), LuaY.toint(), LuaZ.toint()); // "what happens if you pass it a string" fuck you
+			if (!LuaX.isint() || !LuaY.isint() || !LuaZ.isint()) {
+				throw new LuaError("Expected int, got... Not int"); // shut up, okay?
+			}
+			BlockPos pos = new BlockPos(LuaX.toint(), LuaY.toint(), LuaZ.toint());
 			Block block = Minecraft.getMinecraft().world.getBlockState(pos).getBlock();
 			return LuaValue.valueOf(block.toString().substring(6, block.toString().length() -1)); // :)
+			
 		}
 	}
 
@@ -226,6 +233,29 @@ public class Player extends TwoArgFunction {
 		}
 	}
 
+	final class chat extends OneArgFunction { // easiest shit in the world
+		public LuaValue call (LuaValue message) {
+			Minecraft.getMinecraft().player.sendChatMessage(message.toString());
+
+			return LuaValue.NIL;
+		}
+	}
+
+	final class lookedatblock extends ZeroArgFunction {
+		public LuaValue call () {
+			RayTraceResult lookingAt = Minecraft.getMinecraft().objectMouseOver;
+			if (lookingAt != null && lookingAt.typeOfHit == RayTraceResult.Type.BLOCK) {
+				BlockPos blockpos = lookingAt.getBlockPos();
+				LuaValue pos = new LuaTable();
+				pos.set("X", blockpos.getX());
+				pos.set("Y", blockpos.getY());
+				pos.set("Z", blockpos.getZ());
+    			return pos;
+			}
+			return LuaValue.NIL;
+		}
+	}
+
 // the wonders of copy/paste
 	public static Object tryRunMethods(Object o, String[] methodNames) {
 		Method method = null;
@@ -238,7 +268,6 @@ public class Player extends TwoArgFunction {
 				method.setAccessible(true);
 				return method.invoke(o);
 			} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -39,6 +39,7 @@ public class LuaCommand extends CommandBase {
 
     // mocked print that prints to chat
     static class print extends VarArgFunction {
+        
         String prefix;
 
         print(String path) {

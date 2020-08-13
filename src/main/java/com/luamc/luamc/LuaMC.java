@@ -19,7 +19,7 @@ public class LuaMC
 {
     public static final String MODID = "mclua";
     public static final String NAME = "Minecraft Lua Mod";
-    public static final String VERSION = "0.25";
+    public static final String VERSION = "0.27";
 
     LuaThread thread;
     KeyBinding cancel;
